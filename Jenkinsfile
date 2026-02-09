@@ -1,3 +1,4 @@
+ls
 pipeline {
 
   agent any
@@ -12,7 +13,13 @@ pipeline {
     stage('Checkout') { steps { checkout scm } }
     stage('Build') {
       steps {
-        sh 'npm ci'
+        script {
+          if (fileExists('package-lock.json')) {
+            sh 'npm ci'
+          } else {
+            sh 'npm install'
+          }
+        }
         sh 'npm run build'
       }
     }
