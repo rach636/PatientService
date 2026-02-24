@@ -47,7 +47,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 echo "Running SonarQube analysis..."
-                withSonarQubeEnv('sonarcube-app') {
+                withSonarQubeEnv('sonarcube-patientservice') {
                     sh '''
                     sonar-scanner \
                       -Dsonar.projectKey=PatientService \
