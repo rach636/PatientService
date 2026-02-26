@@ -34,6 +34,7 @@ app.use(errorHandler);
 // Database connection and server startup
 const startServer = async () => {
   try {
+    const autoSyncSchema = process.env.AUTO_SYNC_SCHEMA === 'true';
     // Test database connection
     await db.sequelize.authenticate();
     console.log('✓ Database connection established');
@@ -41,7 +42,10 @@ const startServer = async () => {
     // Sync database (use migrations in production)
     if (config.app.nodeEnv === 'development') {
       await db.sequelize.sync({ alter: true });
-      console.log('✓ Database synchronized');
+      console.log('Database synchronized');
+    } else if (autoSyncSchema) {
+      await db.sequelize.sync();
+      console.log('Database schema synced');
     }
 
     // Start server
@@ -91,3 +95,4 @@ if (require.main === module) {
 
 module.exports = app;
 module.exports.startServer = startServer;
+
