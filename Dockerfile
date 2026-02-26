@@ -1,32 +1,25 @@
-# Multi-purpose Dockerfile for PatientService
-# Uses Node 20.11 (Alpine) and runs the app as a non-root user
+# Multi-stage Dockerfile for PatientService
+
+FROM node:20.11-alpine AS deps
+
+WORKDIR /usr/src/app
+COPY package.json package-lock.json* ./
+RUN npm install --omit=dev --no-audit --no-fund && npm cache clean --force
 
 FROM node:20.11-alpine
 
-# Patch OS first
-RUN apk update && apk upgrade --no-cache bash coreutils
+RUN apk update && apk upgrade --no-cache
 
 WORKDIR /usr/src/app
-
-# Copy package files
-COPY package.json package-lock.json* ./
-
-# Install production dependencies and fix vulnerabilities inside the image
-RUN npm install --production --no-audit --no-fund && \
-    npm audit fix --production || true
-
-# Copy source
+COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY . .
 
-# Use a non-root user
-RUN addgroup -S app && adduser -S app -G app
+RUN addgroup -S app && adduser -S app -G app && chown -R app:app /usr/src/app
 USER app
 
-# Environment defaults
 ENV NODE_ENV=production
 ENV PORT=3000
 
 EXPOSE 3000
 
-# Start the service
 CMD ["npm", "start"]
