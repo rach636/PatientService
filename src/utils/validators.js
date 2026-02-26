@@ -19,7 +19,8 @@ const validators = {
     emergencyContactName: Joi.string().max(100).optional(),
     emergencyContactPhone: Joi.string().pattern(/^[\d\s\-\+\(\)]+$/).optional(),
     insuranceProvider: Joi.string().max(100).optional(),
-    insurancePolicyNumber: Joi.string().max(100).optional()
+    insurancePolicyNumber: Joi.string().max(100).optional(),
+    status: Joi.string().valid('active', 'inactive', 'suspended').optional()
   }),
 
   updatePatient: Joi.object({
